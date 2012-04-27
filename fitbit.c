@@ -341,11 +341,16 @@ main (int argc, char **argv)
 	libusb_set_debug (ctx, 3);
 
 	dev = libusb_open_device_with_vid_pid (ctx, 0x10c4, 0x84c4);
+
+	if( dev == NULL) {
+		fprintf (stderr, "missing USB ANT dongle\n");
+		exit (1);
+	}
+
 	device = libusb_get_device (dev);
 
 	if ((rc = libusb_get_device_descriptor (device, &desc)) != 0)
 		die ("get_desc", rc);
-
 	if (0) {
 		printf ("bLength = %d\n", desc.bLength);
 		printf ("bDescriptorType = %d\n", desc.bDescriptorType);
@@ -365,11 +370,14 @@ main (int argc, char **argv)
 		printf ("bNumConfigurations = %d\n", desc.bNumConfigurations);
 	}
 
-	if ((rc = libusb_set_configuration (dev, -1)) != 0)
-		die ("set_config", rc);
-
 	if ((rc = libusb_set_configuration (dev, 1)) != 0)
 		die ("set_config", rc);
+
+	if ((rc = libusb_reset_device (dev)) != 0)
+		die ("reset", rc);
+
+	if ((rc = libusb_set_configuration (dev, 1)) != 0)
+		die ("set_config_post_reset", rc);
 
 	if ((rc = libusb_claim_interface (dev, 0)) != 0)
 		die ("claim", rc);
@@ -488,6 +496,8 @@ control_write (int request, int val, int idx, void *data, int datalen)
 				     100);
 	if (n != datalen)
 		dbg ("control_write: wrote %d, ret %d\n", datalen, n);
+	if (n < 0)
+		die ("control_write ", n);
 	return (n);
 }
 
