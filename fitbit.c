@@ -496,8 +496,6 @@ control_write (int request, int val, int idx, void *data, int datalen)
 				     100);
 	if (n != datalen)
 		dbg ("control_write: wrote %d, ret %d\n", datalen, n);
-	if (n < 0)
-		die ("control_write ", n);
 	return (n);
 }
 
