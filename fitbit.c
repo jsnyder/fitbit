@@ -343,7 +343,7 @@ main (int argc, char **argv)
 	dev = libusb_open_device_with_vid_pid (ctx, 0x10c4, 0x84c4);
 
 	if( dev == NULL) {
-		fprintf (stderr, "missing USB ANT dongle\n");
+		fprintf (stderr, "missing USB ANT base\n");
 		exit (1);
 	}
 
